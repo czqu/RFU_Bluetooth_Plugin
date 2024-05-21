@@ -31,3 +31,17 @@ For any issues or feedback regarding this plugin, please visit the support page 
 ## Download
 
 You can download RemoteFingerUnlock and related plugins from [rfu.czqu.net](https://rfu.czqu.net/).
+
+## License
+
+This project is licensed under the terms of the GNU General Public License v3.0 (GPLv3). You should have received a copy of the GNU General Public License along with this project. If not, see GPLv3 License.
+
+## Third-Party Libraries
+
+### log.c
+
+I use the `log.c` library developed by rxi in this project. Modifications have been made to support `wchar`.
+
+### Windows Classic Samples
+
+I referenced code from the Windows Classic Samples repository by Microsoft for the Bluetooth implementation in this project. The code is licensed under the MIT License.
