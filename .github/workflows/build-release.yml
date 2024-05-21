@@ -1,0 +1,57 @@
+name: build binary
+on:
+  release:
+    types: [published]
+env:
+  BUILD_TYPE: Release
+jobs:
+  build:
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        architecture: [x86,arm64,x64]
+    steps:
+      - uses: actions/checkout@v3
+
+
+      - name: Set env
+        uses: ilammy/msvc-dev-cmd@v1.4.1
+        with:
+          arch:   ${{ matrix.architecture == 'arm64' && 'amd64_arm64' || matrix.architecture  }}
+
+
+
+      - name: Configure CMake
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: |
+          cmake -G Ninja  -S ${{github.workspace}} -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER="cl.exe" -DCMAKE_CXX_COMPILER="cl.exe" 
+
+      - name: Build
+        run: cmake
+          --build ${{github.workspace}}/build
+          --config ${{env.BUILD_TYPE}}
+      - name: List files (Windows)
+        run: Get-ChildItem -Recurse -Name ..
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: BluetoothExtArtifacts(${{matrix.architecture}}).zip
+          path: |
+            build/*.dll
+
+      - name: Create zip archive
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          Compress-Archive -Path build/*.dll -DestinationPath build/BluetoothExt-${{ matrix.architecture }}.zip 
+
+      - name: Release
+        uses: actions/upload-release-asset@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build/BluetoothExt-${{ matrix.architecture }}.zip
+          asset_name: BluetoothExt-${{ matrix.architecture }}.zip
+          asset_content_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHT }}
