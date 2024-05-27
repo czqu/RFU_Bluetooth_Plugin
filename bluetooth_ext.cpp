@@ -115,6 +115,8 @@ DWORD handleData(string &json) {
             password = pair.second;
         }
     }
+    log_debug(L"usr: %d\n",username.length());
+    log_debug(L"pwd: %d\n",password.length());
     if (username.empty() || password.empty()) {
         return ERROR_USER_LOGIN_FAILURE;
     }

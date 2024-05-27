@@ -237,13 +237,15 @@ std::map<std::string, std::string> parseJson(const std::string &jsonString) {
         std::string key, value;
         std::getline(pairStream, key, ':');
         std::getline(pairStream, value);
-
-        key.erase(std::remove(key.begin(), key.end(), '\"'), key.end());
-        value.erase(std::remove(value.begin(), value.end(), '\"'), value.end());
-
-
-
-
+        key.erase(0, key.find_first_not_of('\"'));
+        key.erase(key.find_last_not_of('\"') + 1);
+        value.erase(0, value.find_first_not_of('\"'));
+        value.erase(value.find_last_not_of('\"') + 1);
+        size_t found = value.find("\\");
+        while (found != std::string::npos) {
+            value.replace(found, 2, "\\");
+            found = value.find("\\", found + 1);
+        }
         dataMap[key] = value;
     }
 
